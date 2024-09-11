@@ -28,7 +28,7 @@ export class AuthService {
     //User Verfication
     const user = await this.prismaService.user.findUnique({ where: { email } });
     if (user) throw new ConflictException('User already exists');
-
+    
     //Password Hashing
     const hash = await bcrypt.hash(password, 10);
 
@@ -79,5 +79,5 @@ export class AuthService {
     };
   }
 
-  async resetPassword(resetPassword: ResetPasswordDto) {}
+  //async resetPassword(resetPassword: ResetPasswordDto) {}
 }
