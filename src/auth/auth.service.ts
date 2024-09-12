@@ -72,7 +72,7 @@ export class AuthService {
   async resetPasswordDemand(resetPasswordDemandDto: ResetPasswordDemandDto) {
     const { email } = resetPasswordDemandDto;
     try {
-      const user = await this.getUserByEmail(email);
+      await this.getUserByEmail(email);
       const code = this.generateOtpCode();
       const url = 'http://localhost:3000/auth/reset-password-confirmation';
       await this.mailerService.sendResetPassword(email, url, code);
@@ -90,7 +90,7 @@ export class AuthService {
   ) {
     const { email, code, password } = resetPasswordConfirmationDto;
     try {
-      const user = await this.getUserByEmail(email);
+      await this.getUserByEmail(email);
       this.verifyOtpCode(code);
       const hashedPassword = await this.hashPassword(password);
       await this.updateUserPassword(email, hashedPassword);
