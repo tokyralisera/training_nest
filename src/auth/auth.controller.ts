@@ -1,4 +1,13 @@
-import { Body, Controller, Delete, Post, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  HttpException,
+  HttpStatus,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { SignupDto } from './dto/signupDto';
 import { AuthService } from './auth.service';
 import { SigninDto } from './dto/signinDto';
@@ -13,36 +22,63 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('signup')
-  signup(@Body() signupDto: SignupDto) {
-    return this.authService.signup(signupDto);
+  async signup(@Body() signupDto: SignupDto) {
+    try {
+      return await this.authService.signup(signupDto);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   @Post('signin')
-  signin(@Body() signinDto: SigninDto) {
-    return this.authService.signin(signinDto);
+  async signin(@Body() signinDto: SigninDto) {
+    try {
+      return await this.authService.signin(signinDto);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.UNAUTHORIZED);
+    }
   }
 
   @Post('reset-password')
-  resetPassword(@Body() resetPasswordDemand: ResetPasswordDemandDto) {
-    return this.authService.resetPasswordDemand(resetPasswordDemand);
+  async resetPassword(@Body() resetPasswordDemand: ResetPasswordDemandDto) {
+    try {
+      return await this.authService.resetPasswordDemand(resetPasswordDemand);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   @Post('reset-password-confirmation')
-  resetPasswordConfirmation(
+  async resetPasswordConfirmation(
     @Body() resetPasswordConfirmationDto: ResetPasswordConfirmationDto,
   ) {
-    return this.authService.resetPasswordConfirmation(
-      resetPasswordConfirmationDto,
-    );
+    try {
+      return await this.authService.resetPasswordConfirmation(
+        resetPasswordConfirmationDto,
+      );
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   @UseGuards(AuthGuard('jwt'))
   @Delete('delete')
-  deleteAccount(
+  async deleteAccount(
     @Req() request: Request,
     @Body() deleteAccountDto: DeleteAccountDto,
   ) {
-    const userId = request.user['userId'];
-    return this.authService.deleteAccount(userId, deleteAccountDto);
+    try {
+      const userId = this.extractUserId(request);
+      return await this.authService.deleteAccount(userId, deleteAccountDto);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.FORBIDDEN);
+    }
+  }
+
+  private extractUserId(request: Request): number {
+    if (!request.user || !request.user['userId']) {
+      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+    }
+    return request.user['userId'];
   }
 }

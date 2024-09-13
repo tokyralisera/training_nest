@@ -28,7 +28,7 @@ export class PostController {
   @UseGuards(AuthGuard('jwt'))
   @Post('create')
   create(@Body() createPostDto: CreatePostDto, @Req() request: Request) {
-    const userId = request.user['userId'];
+    const userId = this.extractUserId(request)
     return this.postService.create(createPostDto, userId);
   }
 
@@ -39,14 +39,18 @@ export class PostController {
     @Body() updatePostDto: UpdatePostDto,
     @Req() request: Request,
   ) {
-    const userId = request.user['userId'];
+    const userId = this.extractUserId(request)
     return this.postService.update(postID, userId, updatePostDto);
   }
 
   @UseGuards(AuthGuard('jwt'))
   @Delete('delete/:id')
   delete(@Param('id', ParseIntPipe) postID: number, @Req() request: Request) {
-    const userId = request.user['userId'];
+    const userId = this.extractUserId(request)
     return this.postService.delete(postID, userId);
+  }
+
+  private extractUserId(request: Request): number {
+    return request.user['userId'];
   }
 }
