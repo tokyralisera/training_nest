@@ -31,7 +31,7 @@ export class AuthService {
   ) {
     this.jwtSecret = this.configService.get<string>('SECRET_KEY');
     this.otpSecret = this.configService.get<string>('OTP_CODE');
-    this.jwtExpiration = '1h';
+    this.jwtExpiration = '12h';
   }
 
   /**
@@ -43,7 +43,11 @@ export class AuthService {
       await this.checkUserDoesNotExist(email);
       const hashedPassword = await this.hashPassword(password);
       await this.createUser({ email, username, password: hashedPassword });
-      await this.mailerService.sendSignupConfirmation(email);
+      try {
+        await this.mailerService.sendSignupConfirmation(email);
+      } catch (emailError) {
+        console.error('Erreur lors de l\'envoi de l\'email de confirmation d\' inscription:', emailError.message);
+      }
       return { data: 'User created successfully' };
     } catch (error) {
       this.handleError(error, 'signup');

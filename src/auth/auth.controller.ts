@@ -23,19 +23,26 @@ export class AuthController {
   }
 
   @Post('reset-password')
-  resetPassword(@Body() resetPasswordDemand: ResetPasswordDemandDto){
-    return this.authService.resetPasswordDemand(resetPasswordDemand)
+  resetPassword(@Body() resetPasswordDemand: ResetPasswordDemandDto) {
+    return this.authService.resetPasswordDemand(resetPasswordDemand);
   }
 
   @Post('reset-password-confirmation')
-  resetPasswordConfirmation(@Body() resetPasswordConfirmationDto : ResetPasswordConfirmationDto){
-    return this.authService.resetPasswordConfirmation(resetPasswordConfirmationDto)
+  resetPasswordConfirmation(
+    @Body() resetPasswordConfirmationDto: ResetPasswordConfirmationDto,
+  ) {
+    return this.authService.resetPasswordConfirmation(
+      resetPasswordConfirmationDto,
+    );
   }
 
-  @UseGuards(AuthGuard("jwt"))
-  @Delete("delete")
-  deleteAccount(@Req() request : Request, @Body() deleteAccountDto: DeleteAccountDto){
-    const userId =  request.user["userId"];
-    return this.authService.deleteAccount(userId, deleteAccountDto)
+  @UseGuards(AuthGuard('jwt'))
+  @Delete('delete')
+  deleteAccount(
+    @Req() request: Request,
+    @Body() deleteAccountDto: DeleteAccountDto,
+  ) {
+    const userId = request.user['userId'];
+    return this.authService.deleteAccount(userId, deleteAccountDto);
   }
 }
